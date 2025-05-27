@@ -38,8 +38,8 @@ switch ($action) {
         $numAnnee = substr($leMois, 0, 4);
         $numMois = substr($leMois, 4, 2);
         $nbJustificatifs = $pdo->getnbjustificatif($idVisiteur,$leMois);
-        $nbj = $nbJustificatifs['nbjustificatifs'];
-       // var_dump($nbJustificatifs);
+        //$nbj = $nbJustificatifs;
+        
         if (empty($lesFraisForfait)&& empty($lesFraisHorsForfait)){
             ajouterErreur('Pas de fiche de frais pour ce visiteur ce mois');
             include 'vues/v_erreurs.php';
@@ -64,12 +64,12 @@ switch ($action) {
         $visiteurASelectionner = $idVisiteur;
         $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($idVisiteur, $mois2);
         $lesFraisForfait = $pdo->getLesFraisForfait($idVisiteur, $mois2);
-        $nbJustificatifs = $pdo->getnbjustificatif($idVisiteur,$leMois);
-        $nbj= $nbJustificatifs['nbjustificatifs'];
+        $nbJustificatifs = $pdo->getnbjustificatif($idVisiteur,$mois2);
+        //$nbj= $nbJustificatifs['nbjustificatifs'];
         include 'vues/v_validerfrais.php';
         break;
     case 'fraishorsforfait':
-        $nbJustificatifs = $pdo->getnbjustificatif($idVisiteur,$leMois);
+       
         $idF = filter_input(INPUT_POST, 'idFHF', FILTER_SANITIZE_SPECIAL_CHARS);
         $mois=getMois(date('d/m/Y'));
         $mois2 = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -79,8 +79,9 @@ switch ($action) {
         $montant = filter_input(INPUT_POST, 'montant', FILTER_VALIDATE_FLOAT);
         $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($idVisiteur, $mois2);
         $lesFraisForfait = $pdo->getLesFraisForfait($idVisiteur, $mois2);
-        var_dump($idF);
-        var_dump($mois,$mois2,$idVisiteur,$date,$libelle,$montant);
+        $nbJustificatifs = $pdo->getnbjustificatif($idVisiteur,$mois2);
+        //var_dump($idF);
+        //var_dump($mois,$mois2,$idVisiteur,$date,$libelle,$montant);
         if(isset($_POST["corriger"])){
 //          $mois2 = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_SPECIAL_CHARS);
 //          $idVisiteur = filter_input(INPUT_POST, 'lstv', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -95,10 +96,10 @@ switch ($action) {
             $visiteurASelectionner = $idVisiteur;
             $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($idVisiteur, $mois2);
             $lesFraisForfait = $pdo->getLesFraisForfait($idVisiteur, $mois2);
-            echo'corriger';
+            //echo'corriger';
         }
         elseif (isset($_POST["reporter"])) {
-            echo'reporter';
+            //echo'reporter';
             $idF = filter_input(INPUT_POST, 'idFHF', FILTER_SANITIZE_SPECIAL_CHARS);
             $mois2 = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_SPECIAL_CHARS);
             $idVisiteur = filter_input(INPUT_POST, 'lstv', FILTER_SANITIZE_SPECIAL_CHARS);
@@ -120,7 +121,6 @@ switch ($action) {
             $numAnnee = substr($leMois, 0, 4);
             $numMois = substr($leMois, 4, 2);
             $nbJustificatifs = $pdo->getnbjustificatif($idVisiteur,$leMois);
-            $nbj= $nbJustificatifs['nbjustificatifs'];
             $pdo->majFraisHorsForfait($idF,$libellle,$date,$montant);
             if ($pdo->estPremierFraisMois($idVisiteur, $moisS)) {
             $pdo->creeNouvellesLignesFrais($idVisiteur, $moisS);
@@ -176,4 +176,5 @@ switch ($action) {
         $pdo->majEtatFicheFrais($idVisiteur, $mois2, "VA"); //passe l etats de cl a va
         include 'vues/v_valideravecsucces.php';
         break;
+
 }

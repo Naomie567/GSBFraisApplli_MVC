@@ -5,36 +5,56 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/EmptyPHP.php to edit this template
  */
 
-//ceux controleur presebte une liste droulante qui presente tout les visiteur pour les mois valide
-//deux colone visiteur mois
-//dont etats deja Va
-//ensuite bouton valider
-//et apres recapitulatif de l'etats des frais apres valide'
-//mettre un remboursement c'ewt quoi passer de etas a etat'
 
-$action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_SPECIAL_CHARS);
+$action = filter_input(INPUT_GET, 'action', FILTER_SANITIZE_STRING);
+$mois = getMois(date('d/m/Y'));
+if (!$uc) {
+    $uc = 'suiviPaiement';
+}
 switch ($action) {
-    case 'suivre':
-        $lstVisit=$pdo->getlesvisiteuretmois();
-        $lesVisite=array();
-        $lesMois=array();
-        foreach ($lstVisit as $unVst) {
-            array_push($lesVisite, array($unVst['idvisiteur'],$unVst['nom'],$unVst['prenom']));
-            $numAnnee = substr($unVst['mois'], 0, 4);
-            $numMois = substr($unVst['mois'], 4, 2);
-            array_push($lesMois,$numMois.'/'.$numAnnee );
-        }
-        
-        include 'vues/v_suivrePaiment.php';
+    case 'choixFiche':
+        $lesVisiteurs=$pdo->getLesVisiteursDontFicheVA();
+        $lesCles1=array_keys($lesVisiteurs);
+        $visiteurASelectionner=$lesCles1[0];
+        $lesMois = $pdo->getLesMoisDontFicheVA();
+        $lesCles2=array_keys($lesMois);
+        $moisASelectionner=$lesCles2[0];
+       // $fichesVA = $pdo->fichesVA();
+        include 'vues/v_choixFiche.php';
         break;
-  case'valider':
-    echo'recapitulatif de l etats des frais';
-      $vst = filter_input(INPUT_POST, 'lstV', FILTER_SANITIZE_SPECIAL_CHARS);
-      $mois = filter_input(INPUT_POST, 'lstM', FILTER_SANITIZE_SPECIAL_CHARS);
-      var_dump($vst);
-      var_dump($mois);
-      //include 'une vue a creer laquelle jsp';
-        //et apres recapitulatif de l'etats des frais apres valide'
-        //mettre un remboursement c'ewt quoi passer de etas a etat'
-    break;
+    case 'afficheFrais':
+       $idVisiteur = filter_input(INPUT_POST, 'lstVisiteurs', FILTER_SANITIZE_STRING);
+       $lesVisiteurs=$pdo->getLesVisiteursDontFicheVA();
+       $visiteurASelectionner=$idVisiteur;  
+       $leMois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_STRING);//on recupere ce qui a ete selectionné ds la liste deroulante de nummois(qui se trouve dans v_listemois).
+       $lesMois = $pdo->getLesMoisDisponibles($idVisiteur);
+       $moisASelectionner = $leMois;
+       $lesFraisHorsForfait = $pdo->getLesFraisHorsForfait($idVisiteur, $leMois);
+       $lesFraisForfait = $pdo->getLesFraisForfait($idVisiteur, $leMois);
+       $lesInfosFicheFrais = $pdo->getLesInfosFicheFrais($idVisiteur, $leMois);
+       $numAnnee = substr($leMois, 0, 4);
+       $numMois = substr($leMois, 4, 2);
+       $libEtat = $lesInfosFicheFrais['libEtat'];
+       $montantValide = $lesInfosFicheFrais['montantValide'];
+       $nbJustificatifs = $lesInfosFicheFrais['nbJustificatifs'];
+       $dateModif = dateAnglaisVersFrancais($lesInfosFicheFrais['dateModif']);
+       if(!is_array($lesInfosFicheFrais)){
+            //ajouterErreur('Pas de fiche de frais validée pour ce visiteur ce mois');
+            //include 'vues/v_erreurs.php';
+            include 'vues/v_choixFiche.php';
+        }
+        else{
+            include 'vues/v_etatFrais.php';
+            include 'vues/v_miseEnPaiement.php';
+        }
+        break;
+    case 'paiement':
+        $idVisiteur = filter_input(INPUT_POST, 'lstVisiteurs', FILTER_SANITIZE_STRING);
+        
+        $leMois = filter_input(INPUT_POST, 'lstMois', FILTER_SANITIZE_STRING);//on recupere ce qui a ete selectionné ds la liste deroulante de nummois(qui se trouve dans v_listemois).
+        
+        $etat='RB';
+        $pdo->majEtatFicheFrais($idVisiteur, $leMois, $etat);
+        echo "La fiche a bien été remboursée.";
+        break;
 }

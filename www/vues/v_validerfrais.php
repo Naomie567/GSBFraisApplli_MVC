@@ -144,7 +144,7 @@ foreach ($lesFraisForfait as $unFrais) {
         </table>
     </div>
     <label for="justificatif" accesskey="n">Nombre de justificatifs: </label>
-    <input type= "text" id="justificatif" name="justificatif" value="<?php echo $nbj ?>"  class="form-control">
+    <input type= "text" id="justificatif" name="justificatif" value="<?php echo $nbJustificatifs ?>"  class="form-control">
     <br>
 </div>
           

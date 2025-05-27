@@ -27,7 +27,7 @@ case 'valideConnexion':
     $mdp = filter_input(INPUT_POST, 'mdp', FILTER_SANITIZE_STRING);
     $visiteur = $pdo->getInfosVisiteur($login, $mdp);
     $comptable= $pdo->getInfosComptable($login, $mdp);
-    var_dump($comptable, $visiteur);
+    //var_dump($comptable, $visiteur);
     if($visiteur){
         $id = $visiteur['idV'];
         $nom = $visiteur['nomV'];
@@ -48,11 +48,8 @@ case 'valideConnexion':
         include 'vues/v_erreurs.php';
         include 'vues/v_connexion.php';
     } 
-   
-   
-    
     break;
-  default:   
-include 'vues/v_connexion.php';
- break;
+default:   
+    include 'vues/v_connexion.php';
+    break;
 }

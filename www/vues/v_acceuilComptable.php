@@ -40,7 +40,7 @@
                             <span class="glyphicon glyphicon-pencil"></span>
                             <br>Valider la fiche de frais
                         </a>
-                        <a href="index.php?uc=suivrePaiment&action=suivre"
+                        <a href="index.php?uc=suivrePaiment&action=choixFiche"
                            class="btn btn-primary btn-lg"  role="button">
                             <span class="glyphicon glyphicon-list-alt"></span>
                             <br>Suivre le paiment de la fiches de frais

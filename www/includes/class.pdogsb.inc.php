@@ -37,13 +37,28 @@
  * @link      http://www.php.net/manual/fr/book.pdo.php PHP Data Objects sur php.net
  */
 class PdoGsb {
+    // Connexion en localhost
+        private static $serveur = 'mysql:host=localhost';
+    private static $bdd = 'dbname=gsb_frais';
+    private static $user = 'userGsb';
+    private static $mdp = 'secret';
+    private static $monPdo;
+    private static $monPdoGsb = null;
+    // Connexion externe
+    /*
+    private static $serveur = 'mysql:host=db5017892161.hosting-data.io';
+    private static $bdd = 'dbname=dbs12930308';
+    private static $user = 'dbu2411708';
+    private static $mdp = '2LAyL5YA46iFG6nstar18!';
+    private static $monPdo;
+    private static $monPdoGsb = null;*/
 
-    private static $serveur = 'mysql:host=localhost';
-    private static $bdd = 'dbname=gsb_frais'; //nom de la bdd
-    private static $user = 'userGsb'; //nom d user dans pp my admin
-    private static $mdp = 'secret'; //mdp obn s en fiche
-    private static $monPdo; //on initialise deux variable
-    private static $monPdoGsb = null; //on initialise deux variable
+//    private static $serveur = 'mysql:host=localhost';
+//    private static $bdd = 'dbname=gsb_frais'; //nom de la bdd
+//    private static $user = 'userGsb'; //nom d user dans pp my admin
+//    private static $mdp = 'secret'; //mdp obn s en fiche
+//    private static $monPdo; //on initialise deux variable
+//    private static $monPdoGsb = null; //on initialise deux variable
 
     /**
      * Constructeur privé, crée l'instance de PDO qui sera sollicitée
@@ -470,7 +485,7 @@ class PdoGsb {
     public function majEtatFicheFrais($idVisiteur, $mois, $etat) {
         $requetePrepare = PdoGSB::$monPdo->prepare(
                 'UPDATE ficheFrais '
-                . 'SET idEtat = :unEtat, dateModif = now() '
+                . 'SET idEtat = :unEtat ,dateModif = now() '
                 . 'WHERE fichefrais.idvisiteur = :unIdVisiteur '
                 . 'AND fichefrais.mois = :unMois'
         );
@@ -499,7 +514,7 @@ class PdoGsb {
         $requetePrepare->bindParam(':unIdVisiteur', $idVisiteur, PDO::PARAM_STR);
         $requetePrepare->execute();
         $nbjustificatifs = $requetePrepare->fetch();
-        return $nbjustificatifs;
+        //return $nbjustificatifs;
     }
 
  public function mFraisHorsforfait($mois,$idVisiteur,$date,$libelle,$montant) {
@@ -625,5 +640,43 @@ class PdoGsb {
         $requetePrepare->execute();
         return $requetePrepare->fetchAll();
        
+    }
+    /**
+     * Retourne la liste de tous les visiteurs qui ont des fiches validées.
+     *
+     * @return array     la liste de tous les visiteurs sous forme de tableau associatif.
+     */
+    public function getLesVisiteursDontFicheVA()
+    {
+        $requetePrepare = PdoGsb::$monPdo->prepare(
+            'SELECT *'
+            .'FROM visiteur join fichefrais on(id=idvisiteur)'
+            .'WHERE fichefrais.idetat="VA"'  
+            .'ORDER BY nom'
+        );
+        $requetePrepare->execute();
+        return $requetePrepare->fetchAll();
+    }
+
+public function getLesMoisDontFicheVA()
+    {
+        $requetePrepare = PdoGSB::$monPdo->prepare(
+            'SELECT distinct fichefrais.mois AS mois FROM fichefrais '
+            . 'WHERE fichefrais.idetat="VA"'    
+            . 'ORDER BY fichefrais.mois desc'
+        );
+        $requetePrepare->execute();
+        $lesMois = array();
+        while ($laLigne = $requetePrepare->fetch()) {
+            $mois = $laLigne['mois'];
+            $numAnnee = substr($mois, 0, 4);
+            $numMois = substr($mois, 4, 2);
+            $lesMois[] = array(
+                'mois' => $mois,
+                'numAnnee' => $numAnnee,
+                'numMois' => $numMois
+            );
+        }
+        return $lesMois;
     }
 }

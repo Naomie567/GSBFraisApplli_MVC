@@ -6,8 +6,9 @@
  */
 
 ?>
+  
 <h3>Valide avec succes:</h3>
-<?php echo $vstNom.' '.$vstPrenom; ?><p>a ete valider avec succes pour le mois de</p><?php echo $mois2; ?>
+<span><?php echo $vstNom.' '.$vstPrenom; ?><wbr><p> a ete valider avec succes pour le mois de</p><?php echo $mois2; ?></span>
  <div class="row">
     <div class="panel panel-info">
         <div style="background-color:  orange; color:white" class="panel-heading">Total</div>
@@ -29,4 +30,4 @@
             </tbody>  
         </table>
     </div>
-      </div>
+</div>
